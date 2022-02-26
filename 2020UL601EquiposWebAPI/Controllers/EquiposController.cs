@@ -16,6 +16,8 @@ namespace _2020UL601EquiposWebAPI.Controllers
             this._contexto=mycontext;
         }
 
+        //CONSULTA GENERAL
+
         [HttpGet]
         [Route("api/equipos")]
         public IActionResult Get()
@@ -30,20 +32,69 @@ namespace _2020UL601EquiposWebAPI.Controllers
             return NotFound();
         }
 
-        //[HttpGet]
-        //[Route("api/equipos/{idequipo}")]
-        //public IActionResult Get(int idequipo)
-        //{
+        //CONSULTA FILTRADA
 
-        //    Equipos equiplist = (from e in _contexto.equipos where e.id_equipos==idequipo select e).FirstOrDefault();
+        [HttpGet]
+        [Route("api/equipos/{idequipo}")]
+        public IActionResult Get(int idequipo)
+        {
+            
+            Equipos equiplist = (from e in _contexto.equipos where e.id_equipos==idequipo select e).FirstOrDefault();         
 
-        //    if (equiplist!=null)
-        //    {
-        //        return Ok(equiplist);
-        //    }
+            if (equiplist!=null)
+            {
+                return Ok(equiplist);
+            }
 
-        //    return NotFound();
-        //}
+            return NotFound();
+        }
+
+
+        //AGREGAR EQUIPO
+
+        [HttpPost]
+        [Route("api/equipos/")]
+        public IActionResult agregarEquipo([FromBody]Equipos equipNew)
+        {
+
+            _contexto.equipos.Add(equipNew);
+            _contexto.SaveChanges();
+
+            return Ok(equipNew);
+        }
+
+        //EDITAR EQUIPO
+
+        [HttpPut]
+        [Route("api/equipos/")]
+        public IActionResult editarEquipo([FromBody] Equipos equipUpdate)
+        {
+
+            Equipos equipExist = (from e in _contexto.equipos 
+                                  where e.id_equipos==equipUpdate.id_equipos select e).FirstOrDefault();
+
+            if (equipExist is null)
+            {
+                return NotFound();
+            }
+
+            equipExist.nombre=equipUpdate.nombre;
+            equipExist.descripcion=equipUpdate.descripcion;
+            equipExist.tipo_equipo_id=equipUpdate.tipo_equipo_id;
+            equipExist.marca_id=equipUpdate.marca_id;
+            equipExist.modelo=equipUpdate.modelo;
+            equipExist.anio_compra=equipUpdate.anio_compra;
+            equipExist.costo=equipUpdate.costo;
+            equipExist.vida_util=equipUpdate.vida_util;
+            equipExist.estado_equipo_id=equipUpdate.estado_equipo_id;
+            equipExist.estado=equipUpdate.estado;
+
+            _contexto.Entry(equipExist).State=EntityState.Modified;
+            _contexto.SaveChanges();
+
+            return Ok(equipExist);
+        }
+
 
     }
 }
